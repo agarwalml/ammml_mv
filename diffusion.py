@@ -18,6 +18,7 @@ def prompt_model(prompt, pipe):
 
 
 def lyrics_to_images(lines, pipe, out_dir):
+    print("Creating images from lyrics")
     for i, line in tqdm.tqdm(list(enumerate(lines))):
         image = prompt_model(line, pipe)
         image.save(os.path.join(out_dir, f"img_{i:03d}.png"))
