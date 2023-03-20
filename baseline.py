@@ -3,12 +3,18 @@ import os
 import subprocess
 import sys
 
+import numpy as np
+from PIL import Image
+
 import diffusion
 import transcriber
 
 
 def create_video(lyrics, no_lyrics):
     print("Creating video")
+    black = np.zeros((512, 512, 3), dtype=np.uint8)
+    img = Image.fromarray(black, "RGB")
+    img.save("black.png")
     out_lines = []
     t = 0
     for i, (start, end, line) in enumerate(lyrics):
@@ -38,6 +44,8 @@ def create_video(lyrics, no_lyrics):
 
 def main():
     url = sys.argv[1]
+    out_dir = sys.argv[2]
+    os.chdir(out_dir)
     transcriber.get_audio(url)
     transcriber.get_result()
     lyrics, no_lyrics = transcriber.create_lyric_timestamps()
