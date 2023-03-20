@@ -45,6 +45,7 @@ def create_video(lyrics, no_lyrics):
 def main():
     url = sys.argv[1]
     out_dir = sys.argv[2]
+    os.makedirs(out_dir, exist_ok=True)
     os.chdir(out_dir)
     transcriber.get_audio(url)
     transcriber.get_result()
