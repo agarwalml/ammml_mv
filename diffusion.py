@@ -3,6 +3,7 @@ from diffusers import StableDiffusionPipeline, EulerDiscreteScheduler
 import torch
 import tqdm
 
+seed = 42
 
 def create_model():
     model_id = "stabilityai/stable-diffusion-2-1-base"
@@ -13,7 +14,9 @@ def create_model():
 
 
 def prompt_model(prompt, pipe):
-    image = pipe(prompt).images[0]
+    negative_prompt = "nsfw, text, poorly Rendered face, poorly drawn face, poor facial details, poorly drawn hand, poorly rendered hands, low resolution, Images cut out at the top, left, right, bottom. bad composition, mutated body parts, blurry image, disfigured, oversaturated, bad anatomy, deformed body features"
+    style_comp_prompt = "Surrealism, trending on artstation, matte, elegant, illustration, digital paint, epic composition, beautiful, the most beautiful image ever seen,"
+    image = pipe(prompt=(prompt + style_comp_prompt), negative_prompt=negative_prompt, seed=seed).images[0]
     return image
 
 
