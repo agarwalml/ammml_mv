@@ -6,9 +6,6 @@ import sys
 import numpy as np
 from PIL import Image
 
-import diffusion
-import transcriber
-
 
 def create_video(lyrics, no_lyrics):
     print("Creating video")
@@ -40,24 +37,3 @@ def create_video(lyrics, no_lyrics):
         f.writelines(out_lines)
     cmd = ["ffmpeg", "-f", "concat", "-i", "concat.txt", "-i", "audio.mp3", "-map", "0:v", "-map", "1:a", "-c:v", "libx264", "-vsync", "vfr", "-vf", "mpdecimate", "-pix_fmt", "yuv420p", "-c:a", "copy", "-shortest", "video.mp4"]
     subprocess.run(cmd, check=True)
-
-
-def main():
-    url = sys.argv[1]
-    out_dir = sys.argv[2]
-    os.makedirs(out_dir, exist_ok=True)
-    os.chdir(out_dir)
-    transcriber.get_audio(url)
-    # transcriber.get_result()
-    lyrics, no_lyrics = transcriber.create_timestamps()
-    os.makedirs("out", exist_ok=True)
-    model = diffusion.create_model()
-    lines = list(map(lambda x: x[2], lyrics))
-    diffusion.lyrics_to_images(lines, model, "out")
-    # paths = list(sorted(glob.glob("out/img_*.png")))
-    create_video(lyrics, no_lyrics)
-    print("Done!")
-
-
-if __name__ == "__main__":
-    main()

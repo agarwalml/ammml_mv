@@ -1,9 +1,12 @@
 import os
 from diffusers import StableDiffusionPipeline, EulerDiscreteScheduler
+import numpy as np
 import torch
 import tqdm
 
-seed = 42
+
+seed = None
+
 
 def create_model():
     model_id = "stabilityai/stable-diffusion-2-1-base"
@@ -13,15 +16,25 @@ def create_model():
     return pipe
 
 
-def prompt_model(prompt, pipe):
-    negative_prompt = "nsfw, text, poorly Rendered face, poorly drawn face, poor facial details, poorly drawn hand, poorly rendered hands, low resolution, Images cut out at the top, left, right, bottom. bad composition, mutated body parts, blurry image, disfigured, oversaturated, bad anatomy, deformed body features"
-    style_comp_prompt = "Surrealism, trending on artstation, matte, elegant, illustration, digital paint, epic composition, beautiful, the most beautiful image ever seen,"
-    image = pipe(prompt=(prompt + style_comp_prompt), negative_prompt=negative_prompt, seed=seed).images[0]
+def prompt_model(prompt, pipe, pos=False, neg=False):
+    negative_prompt = None
+    if neg:
+        negative_prompt = "nsfw, text, watermark, ugly, poorly rendered face, poorly drawn face, poor facial details, poorly drawn hand, poorly rendered hands, low resolution, image cut off, bad composition, mutated body parts, blurry image, disfigured, oversaturated, bad anatomy, deformed body features, low quality"
+    style_comp_prompt = ""
+    if pos:
+        style_comp_prompt = ". Trending on artstation, matte, elegant, illustration, detailed, digital painting, epic composition, beautiful art"
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    image = pipe(prompt=(prompt + style_comp_prompt), negative_prompt=negative_prompt).images[0]
     return image
 
 
-def lyrics_to_images(lines, pipe, out_dir):
+def lyrics_to_images(lines, pipe, out_dir, params):
     print("Creating images from lyrics")
+    if params["seed_consistency"]:
+        global seed
+        seed = np.random.randint(np.iinfo(np.int64).max)
+        print("Seed:", seed)
     for i, line in tqdm.tqdm(list(enumerate(lines))):
-        image = prompt_model(line, pipe)
+        image = prompt_model(line, pipe, params["style_prompt"], params["negative_prompt"])
         image.save(os.path.join(out_dir, f"img_{i:03d}.png"))

@@ -14,13 +14,16 @@ from pathlib import Path
 
 from googletrans import Translator
 # import youtube_dl
-from pytube import YouTube
+from pytube import YouTube, Caption
 
 AUDIOFILE = "audio.mp3"  # Save audio file as audio.mp3
 outdir = ""  # Save audio file to current working directory
 lyrics = []
 no_lyrics = []
+captions = []
+no_captions = []
 total_clip_length = 0.0
+do_captions_exist = False
 
 def match_pattern(pattern, arg):
     """Convert it to normal video URL if YouTube shorts URL is given."""
@@ -50,6 +53,16 @@ def get_audio(url):
     yt = YouTube(url)
     ##@ Extract audio with 160kbps quality from video
     video = yt.streams.filter(abr='160kbps').last()
+
+    ##@ Get the caption if they exist in english
+    # caption = yt.captions.get_by_language_code('en')
+    caption = False # bug workaround
+    if caption:
+        global do_captions_exist
+        do_captions_exist = True
+        sys.stdout = open("captions.txt", "w")
+        print(caption.generate_srt_captions())
+        sys.stdout = sys.__stdout__
 
     ##@ Downloadthe file
     out_file = video.download(output_path=outdir)
@@ -97,10 +110,16 @@ def get_result():
     
     # format_result('transcription.txt', result["text"])
 
-def timestamp_to_seconds(time_str):
-    """Convert timestamp to seconds."""
+def timestamp_to_seconds_whisper(time_str):
+    """Convert timestamp to seconds that are in the form  00:29.920"""
     timestamp = time_str.split(':')
     time = float(timestamp[0]) * 60 + float(timestamp[1])
+    return time
+
+def srt_to_seconds(time_str):
+    """Convert srt to seconds that are in the form 00:00:11,333"""
+    timestamp = time_str.split(':')
+    time = float(timestamp[0]) * 60 * 60 + float(timestamp[1]) * 60 + float(timestamp[2].split(',')[0]) + float(timestamp[2].split(',')[1]) / 1000
     return time
 
 def create_lyric_timestamps():
@@ -130,17 +149,17 @@ def create_lyric_timestamps():
             # remove spaces from timestamp
             timestamp1 = timestamps.split('-->')[0].replace(" ", "")
             # convert timestamp to seconds
-            t1 = timestamp_to_seconds(timestamp1)
+            t1 = timestamp_to_seconds_whisper(timestamp1)
 
             timestamp2 = timestamps.split('-->')[1].replace(" ", "")
             # convert timestamp to seconds
-            t2 = timestamp_to_seconds(timestamp2)
+            t2 = timestamp_to_seconds_whisper(timestamp2)
 
             # remove space from beginning and end of sentence
             sentence = lines[i].split(']')[1].strip()
             lyrics.append([t1, t2, sentence])
     sys.stdout = sys.__stdout__
-    lyrics.pop(-1)
+    lyrics.pop(-1) # remove junk at the end
     # Calculate empty space between timestamps
     last_end_time = 0
     for i in range(len(lyrics)):
@@ -154,11 +173,88 @@ def create_lyric_timestamps():
             if (t2 < total_clip_length):
                 # print("I'm here 2")
                 no_lyrics.append([t2, total_clip_length])
-    print("Lyrics:")
+    print("Lyrics: ")
     print(lyrics)
-    print("No lyrics:")
+    print("Parts of song with no lyrics: ")
     print(no_lyrics)
     return lyrics, no_lyrics
+
+
+def create_caption_timestamps():
+    # open and read captions.txt line by line
+    # get global total clip length
+    global total_clip_length
+    # print("Total clip length in seconds: " + str(total_clip_length))
+    sys.stdout = sys.__stdout__
+    print("Creating caption timestamps")
+    caption_file = open('captions.txt', 'r')
+    lines = caption_file.readlines()
+    # print(lines)
+    caption_file.close()
+
+    # create a list of captions with timestamps
+    # Captions are in the form:
+    # 1
+    # 00:13:20,000 --> 01:14:26,000
+    # ♪♪ LYRICS ♪♪
+    # Blank line
+    t1 = 0.0
+    t2 = 0.0
+    sentence = ""
+    for i in range(len(lines)):
+        if(i % 4 == 0):
+            continue
+        elif(i % 4 == 1):
+            # get timestamp 1 and get timestamp 2 from input like "00:13:20,000 --> 01:14:26,000"
+            timestamps = lines[i]
+            # remove spaces from timestamp
+            timestamp1 = timestamps.split('-->')[0].replace(" ", "")
+            # convert timestamp to seconds
+            t1 = srt_to_seconds(timestamp1)
+
+            timestamp2 = timestamps.split('-->')[1].replace(" ", "")
+            # convert timestamp to seconds
+            t2 = srt_to_seconds(timestamp2)
+        elif(i % 4 == 2):
+            if(lines[i] == '\n' or lines[i] == ' ' or lines[i] == '♪♪'):
+                continue
+            else:# remove space from beginning and end of sentence
+                sentence = lines[i].strip()
+                # remove ♪ from sentence
+                sentence = sentence.replace('♪', '')
+                sentence = sentence.strip()
+
+        elif(i % 4 == 3):
+
+            captions.append([t1, t2, sentence])
+    sys.stdout = sys.__stdout__
+
+    # Calculate empty space between timestamps
+    last_end_time = 0
+    for i in range(len(captions)):
+        t1 = captions[i][0]
+        t2 = captions[i][1]
+        if (t1 > last_end_time):
+            no_captions.append([last_end_time, t1])
+        last_end_time = t2
+        if (i == (len(captions) - 1)):
+            # print("I'm here 1")
+            if (t2 < total_clip_length):
+                # print("I'm here 2")
+                no_captions.append([t2, total_clip_length])
+    print("Lyrics: ")
+    print(captions)
+    print("Parts of song with no lyrics: ")
+    print(no_captions)
+    return captions, no_captions
+
+
+def create_timestamps():
+    if(do_captions_exist):
+        return create_caption_timestamps()
+    else:
+        get_result()  # Get audio transcription and translation if needed
+        return create_lyric_timestamps()
 
 
 # def format_result(file_name, text):
