@@ -33,7 +33,7 @@ def lyrics_to_images(lines, pipe, out_dir, params):
     print("Creating images from lyrics")
     if params["seed_consistency"]:
         global seed
-        seed = np.random.randint(np.iinfo(np.int64).max)
+        seed = np.random.randint(np.iinfo(np.int32).max)
         print("Seed:", seed)
     for i, line in tqdm.tqdm(list(enumerate(lines))):
         image = prompt_model(line, pipe, params["style_prompt"], params["negative_prompt"])
