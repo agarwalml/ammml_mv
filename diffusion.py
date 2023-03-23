@@ -23,8 +23,9 @@ def prompt_model(prompt, pipe, pos=False, neg=False):
     style_comp_prompt = ""
     if pos:
         style_comp_prompt = ". Trending on artstation, matte, elegant, illustration, detailed, digital painting, epic composition, beautiful art"
-    np.random.seed(seed)
-    torch.manual_seed(seed)
+    if seed is not None:
+        np.random.seed(seed)
+        torch.manual_seed(seed)
     image = pipe(prompt=(prompt + style_comp_prompt), negative_prompt=negative_prompt).images[0]
     return image
 
