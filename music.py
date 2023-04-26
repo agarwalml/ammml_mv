@@ -41,3 +41,9 @@ def music_features(music):
     v, a = valence_arousal(music)
     features = va_to_emotion(v, a)
     return features
+
+
+def spectrogram_bins(music, length):
+    hop = sr // length
+    spec = librosa.feature.melspectrogram(y=music, sr=sr, n_mels=4, hop_length=hop)
+    return spec
