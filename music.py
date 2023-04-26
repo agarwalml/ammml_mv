@@ -43,7 +43,7 @@ def music_features(music):
     return features
 
 
-def spectrogram_bins(music, length):
-    hop = sr // length
+def spectrogram_bins(music, fr):
+    hop = sr // fr
     spec = librosa.feature.melspectrogram(y=music, sr=sr, n_mels=4, hop_length=hop)
     return spec
