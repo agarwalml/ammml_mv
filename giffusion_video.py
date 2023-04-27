@@ -7,6 +7,7 @@ import numpy as np
 from PIL import Image
 from pydub import AudioSegment
 from giffusion.generate import run
+from giffusion.app import load_pipeline
 
 
 
@@ -20,6 +21,7 @@ def create_video(lyrics, no_lyrics):
     out_lines = []
     t = 0
     for i, (start, end, line) in enumerate(lyrics):
+        pipe = load_pipeline("stabilityai/stable-diffusion-2-1-base", "DiffusionPipeline")
         if start > t and i == 0:
             dur = start - t
             t = start
@@ -37,11 +39,8 @@ def create_video(lyrics, no_lyrics):
 
             # generate giffusion output from black to first lyric prompt
 
-            # need to create proper pipe and generate random seed
-
-            # pipe = create_model()
             
-            # seed = np.random.randint(np.iinfo(np.int32).max)
+            seed = np.random.randint(np.iinfo(np.int32).max)
             run(pipe=pipe, text_prompt_inputs=text_prompt_input, negative_prompt_inputs=negative_prompt, fps=10, audio_input="temp.mp3", seed=seed, model_name="stable-diffusion-2-1-base")
         elif start > t:
             dur = start - t
