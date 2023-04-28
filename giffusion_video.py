@@ -6,17 +6,17 @@ import sys
 import numpy as np
 from PIL import Image
 from pydub import AudioSegment
+import torch
 from giffusion.generate import run
-from giffusion.app import load_pipeline
-
-import mer
+from diffusers import StableDiffusionPipeline, EulerDiscreteScheduler
+# from giffusion.app import load_pipeline
 
 
 FR = 10
-MELANCHOLY = ", melancholy, dark, depressing style"
-SERENE = ", serene, chill vibes, bright, meditative style"
-TENSE = ", tense, energetic, dark, angry and scary style"
-EUPHORIC = ", euphoric, energetic, bright, good vibes, happy style"
+MELANCHOLY = "Melancholy, dark, depressing style"
+SERENE = "Serene, chill vibes, bright, meditative style"
+TENSE = "Tense, energetic, dark, angry and scary style"
+EUPHORIC = "Euphoric, energetic, bright, good vibes, happy style"
 EMOTIONS = {
     "melancholy": MELANCHOLY,
     "serene": SERENE,
@@ -24,7 +24,8 @@ EMOTIONS = {
     "euphoric": EUPHORIC,
     "default": "",
 }
-STYLE = ". Trending on artstation, matte, elegant, illustration, detailed, digital painting, epic composition, beautiful artwork"
+# STYLE = "Trending on artstation, matte, elegant, illustration, detailed, digital painting, epic composition, beautiful artwork"
+STYLE = "Trending on artstation, digital painting, matte, illustration, detailed, professional artwork"
 NEGATIVE = "nsfw, text, watermark, ugly, poorly rendered face, poorly drawn face, poor facial details, poorly drawn hand, poorly rendered hands, low resolution, image cut off, bad composition, mutated body parts, blurry image, disfigured, oversaturated, bad anatomy, deformed body features, low quality"
 
 
@@ -64,9 +65,18 @@ def build_prompts(mux, default="Abstract art of music"):
             lyric = default
         if emotion is None:
             emotion = "default"
-        prompts.append(f"{round(start * FR)}: {lyric}{style}{EMOTIONS[emotion]}")
+        prompts.append(f"{round(start * FR)}: {STYLE}. {lyric} {EMOTIONS[emotion]}")
     prompts = "\n".join(prompts)
     return prompts
+
+
+def get_pipe():
+    model_id = "stabilityai/stable-diffusion-2-1-base"
+    scheduler = EulerDiscreteScheduler.from_pretrained(model_id, subfolder="scheduler")
+    pipe = StableDiffusionPipeline.from_pretrained(model_id, scheduler=scheduler, torch_dtype=torch.float16)
+    pipe.enable_xformers_memory_efficient_attention()
+    pipe = pipe.to("cuda")
+    return pipe
 
 
 def create_video(lyrics, emotions, title, seed=42):
@@ -79,12 +89,15 @@ def create_video(lyrics, emotions, title, seed=42):
     # out_lines = []
     # t = 0
 
-    pipe = load_pipeline("stabilityai/stable-diffusion-2-1-base", "DiffusionPipeline")
     # lyrics: list of (start, end, lyric) pairs
     # emotions = mer.extract_emotions("audio.mp3") # list of (start, end, emotion) pairs
     mux = mux_lyrics_emotions(lyrics, emotions)
+    print(mux)
     prompts = build_prompts(mux, default=title)
-    run(pipe=pipe, text_prompt_inputs=prompts, negative_prompt_inputs=NEGATIVE, fps=FPS, audio_input="audio.mp3", seed=seed, model_name="stable-diffusion-2-1-base")
+    print(prompts)
+    # pipe = load_pipeline("stabilityai/stable-diffusion-2-1-base", "StableDiffusionPipeline", False, None)[0]
+    pipe = get_pipe()
+    run(pipe=pipe, text_prompt_inputs=prompts, negative_prompt_inputs=NEGATIVE, fps=FR, audio_input="audio.mp3", seed=seed, model_name="stable-diffusion-2-1-base")
 
 
     # for i, (start, end, line) in enumerate(lyrics):

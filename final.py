@@ -7,7 +7,10 @@ import music
 import transcriber
 # import video
 import giffusion_video
-from MultimodalMusicEmotion.utils import extract_emotions
+from MultimodalMusicEmotion.utils import extract_emotions, extract_emotions_debug
+
+
+debug = True
 
 
 def main():
@@ -16,7 +19,8 @@ def main():
     url = sys.argv[2]
     out_dir = sys.argv[3]
     model_path = sys.argv[4]
-    seed = sys.argv[5]
+    seed = int(sys.argv[5])
+    print("Automatic Multimodal Music Video Generation")
     # params = {}
     # params["seed_consistency"] = bool(int(modstring[0]))
     # params["style_prompt"] = bool(int(modstring[1]))
@@ -51,9 +55,13 @@ def main():
     # paths = list(sorted(glob.glob("out/img_*.png")))
     # video.create_video(lyrics, no_lyrics)
     print("Extracting emotions...")
-    emotions = extract_emotions("audio.mp3", model_path)
+    if debug:
+        csv_path = sys.argv[6]
+        emotions = extract_emotions_debug(csv_path, model_path)
+    else:
+        emotions = extract_emotions("audio.mp3", model_path)
     print("Generating video...")
-    giffusion_video.create_video(lyrics, emotions, title, seed):
+    giffusion_video.create_video(lyrics, emotions, title, seed)
     print("Done!")
 
 

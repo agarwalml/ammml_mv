@@ -25,6 +25,19 @@ no_captions = []
 total_clip_length = 0.0
 do_captions_exist = False
 
+
+def reset(): # hack
+    global AUDIOFILE, outdir, lyrics, no_lyrics, captions, no_captions, total_clip_length, do_captions_exist
+    AUDIOFILE = "audio.mp3"  # Save audio file as audio.mp3
+    outdir = ""  # Save audio file to current working directory
+    lyrics = []
+    no_lyrics = []
+    captions = []
+    no_captions = []
+    total_clip_length = 0.0
+    do_captions_exist = False
+
+
 def match_pattern(pattern, arg):
     """Convert it to normal video URL if YouTube shorts URL is given."""
     match = re.search(pattern, arg)
@@ -50,36 +63,38 @@ def get_audio(url):
     #     if opt in ['-u', '--url']:
     #         url = match_pattern("shorts/", arg)
 
-    yt = YouTube(url)
-    ##@ Extract audio with 160kbps quality from video
-    video = yt.streams.filter(abr='160kbps').last()
+    # yt = YouTube(url)
+    # ##@ Extract audio with 160kbps quality from video
+    # video = yt.streams.filter(abr='160kbps').last()
 
-    ##@ Get the caption if they exist in english
-    # caption = yt.captions.get_by_language_code('en')
-    caption = False # bug workaround
-    if caption:
-        global do_captions_exist
-        do_captions_exist = True
-        sys.stdout = open("captions.txt", "w")
-        print(caption.generate_srt_captions())
-        sys.stdout = sys.__stdout__
+    # ##@ Get the caption if they exist in english
+    # # caption = yt.captions.get_by_language_code('en')
+    # caption = False # bug workaround
+    # if caption:
+    #     global do_captions_exist
+    #     do_captions_exist = True
+    #     sys.stdout = open("captions.txt", "w")
+    #     print(caption.generate_srt_captions())
+    #     sys.stdout = sys.__stdout__
 
-    ##@ Downloadthe file
-    out_file = video.download(output_path=outdir)
-    base, ext = os.path.splitext(out_file)
+    # ##@ Downloadthe file
+    # out_file = video.download(output_path=outdir)
+    # base, ext = os.path.splitext(out_file)
     # new_file = Path(f'{base}.mp3')
+    os.system(f"yt-dlp -x --audio-format mp3 --max-filesize 25M {url} -o audio.mp3")
     new_file = Path('audio.mp3')
-    os.rename(out_file, new_file)
+    # os.rename(out_file, new_file)
     ##@ Check success of download
-    if new_file.exists():
-        print(f'{yt.title} has been successfully downloaded.')
-    else:
-        print(f'ERROR: {yt.title}could not be downloaded!')
+    # if new_file.exists():
+    #     print(f'{yt.title} has been successfully downloaded.')
+    # else:
+    #     print(f'ERROR: {yt.title}could not be downloaded!')
     
     global total_clip_length
-    total_clip_length = float(yt.length)
-    print("Total clip length in seconds: " + str(total_clip_length))
-    print("Total clip length: " + str(int(total_clip_length // 60)) + ":" + str(int(total_clip_length % 60)))
+    total_clip_length = 0
+    # total_clip_length = float(yt.length)
+    # print("Total clip length in seconds: " + str(total_clip_length))
+    # print("Total clip length: " + str(int(total_clip_length // 60)) + ":" + str(int(total_clip_length % 60)))
     AUDIOFILE = new_file
 
 def banner(text):

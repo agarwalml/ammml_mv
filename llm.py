@@ -14,6 +14,6 @@ def prompt_chatgpt(prompt):
 
 def lyrics_to_prompts(lyrics):
     print("Prompting LLM")
-    prefix = "Convert to a detailed image description: "
-    prompts = [(start, end, prompt_chatgpt(prefix + line)) for start, end, line in tqdm.tqdm(lyrics)]
+    prefix = "Generate a detailed image description based on this line: \"{}\""
+    prompts = [(start, end, prompt_chatgpt(prefix.format(line)).split("\n")[0]) for start, end, line in tqdm.tqdm(lyrics)]
     return prompts
