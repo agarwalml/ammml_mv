@@ -15,6 +15,7 @@ from pathlib import Path
 from googletrans import Translator
 # import youtube_dl
 from pytube import YouTube, Caption
+from mutagen.mp3 import MP3
 
 AUDIOFILE = "audio.mp3"  # Save audio file as audio.mp3
 outdir = ""  # Save audio file to current working directory
@@ -81,8 +82,8 @@ def get_audio(url):
     # out_file = video.download(output_path=outdir)
     # base, ext = os.path.splitext(out_file)
     # new_file = Path(f'{base}.mp3')
-    os.system(f"yt-dlp -x --audio-format mp3 --max-filesize 25M {url} -o audio.mp3")
-    new_file = Path('audio.mp3')
+    os.system(f"yt-dlp -x --audio-format mp3 --max-filesize 25M {url} -o {AUDIOFILE}")
+    new_file = Path(AUDIOFILE)
     # os.rename(out_file, new_file)
     ##@ Check success of download
     # if new_file.exists():
@@ -90,12 +91,12 @@ def get_audio(url):
     # else:
     #     print(f'ERROR: {yt.title}could not be downloaded!')
     
-    global total_clip_length
-    total_clip_length = 0
+    # global total_clip_length
+    # total_clip_length = 0
     # total_clip_length = float(yt.length)
     # print("Total clip length in seconds: " + str(total_clip_length))
     # print("Total clip length: " + str(int(total_clip_length // 60)) + ":" + str(int(total_clip_length % 60)))
-    AUDIOFILE = new_file
+    # AUDIOFILE = new_file
 
 def banner(text):
     """Display a message when the script is working in the background"""
@@ -112,6 +113,9 @@ def check_device():
 
 
 def get_result():
+    global total_clip_length
+    audio = MP3(AUDIOFILE)
+    total_clip_length = audio.info.length
     """Get speech recognition model."""
     # model_name = input("Select speech recognition model name (tiny, base, small, medium, large): ")
     model_name = "large"
@@ -140,7 +144,7 @@ def srt_to_seconds(time_str):
 def create_lyric_timestamps():
     # open and read transcription.txt line by line
     # get global total clip length
-    global total_clip_length
+    # global total_clip_length
     # print("Total clip length in seconds: " + str(total_clip_length))
     sys.stdout = sys.__stdout__
     print("Creating lyric timestamps")
@@ -151,7 +155,7 @@ def create_lyric_timestamps():
     # create a list of lyrics with timestamps
     for i in range(len(lines)):
         if(i == 0):
-            total_clip_length = float(lines[i].split('Clip length: ')[1])
+            # total_clip_length = float(lines[i].split('Clip length: ')[1])
             continue
         if (i == 1 or i == 2):
             continue
@@ -192,7 +196,7 @@ def create_lyric_timestamps():
     print(lyrics)
     print("Parts of song with no lyrics: ")
     print(no_lyrics)
-    return lyrics, no_lyrics
+    return lyrics, no_lyrics, total_clip_length
 
 
 def create_caption_timestamps():
@@ -261,7 +265,7 @@ def create_caption_timestamps():
     print(captions)
     print("Parts of song with no lyrics: ")
     print(no_captions)
-    return captions, no_captions
+    return captions, no_captions, total_clip_length
 
 
 def create_timestamps():

@@ -14,6 +14,16 @@ def prompt_chatgpt(prompt):
 
 def lyrics_to_prompts(lyrics):
     print("Prompting LLM")
-    prefix = "Generate a detailed image description based on this line: \"{}\""
+    prefix = "In one English sentence, generate a visually descriptive image caption based on this line: \"{}\""
     prompts = [(start, end, prompt_chatgpt(prefix.format(line)).split("\n")[0]) for start, end, line in tqdm.tqdm(lyrics)]
+    print(prompts)
+    return prompts
+
+
+def mux_to_prompts(mux):
+    print("Prompting LLM")
+    prefix = "In one English sentence, generate a visually descriptive image caption with moderately {} arousal and moderately {} valence based on this line: \"{}\""
+    prompts = [(start, end, prompt_chatgpt(prefix.format(arousal, valence, lyric)).split("\n")[0]) for start, end, lyric, (arousal, valence) in tqdm.tqdm(mux)]
+    # if lyric is not None else (start, end, default)
+    print(prompts)
     return prompts

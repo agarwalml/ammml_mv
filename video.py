@@ -24,7 +24,7 @@ def create_video(lyrics, no_lyrics):
         t = end
         out_lines.append(f"file out/img_{i:03d}.png\n")
         out_lines.append(f"duration {dur}\n")
-    start, end = no_lyrics[-1]
+    # start, end = no_lyrics[-1]
     if end > t:
         dur = end - t
         t = end

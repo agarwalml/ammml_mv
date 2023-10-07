@@ -13,10 +13,10 @@ from diffusers import StableDiffusionPipeline, EulerDiscreteScheduler
 
 
 FR = 10
-MELANCHOLY = "Melancholy, dark, depressing style"
-SERENE = "Serene, chill vibes, bright, meditative style"
-TENSE = "Tense, energetic, dark, angry and scary style"
-EUPHORIC = "Euphoric, energetic, bright, good vibes, happy style"
+MELANCHOLY = "Style: melancholy, calm, moody, pensive"
+SERENE = "Style: serene, chill, bright, meditative"
+TENSE = "Style: tense, energetic, moody, aggresive"
+EUPHORIC = "Style: euphoric, energetic, bright, happy"
 EMOTIONS = {
     "melancholy": MELANCHOLY,
     "serene": SERENE,
@@ -25,11 +25,12 @@ EMOTIONS = {
     "default": "",
 }
 # STYLE = "Trending on artstation, matte, elegant, illustration, detailed, digital painting, epic composition, beautiful artwork"
-STYLE = "Trending on artstation, digital painting, matte, illustration, detailed, professional artwork"
-NEGATIVE = "nsfw, text, watermark, ugly, poorly rendered face, poorly drawn face, poor facial details, poorly drawn hand, poorly rendered hands, low resolution, image cut off, bad composition, mutated body parts, blurry image, disfigured, oversaturated, bad anatomy, deformed body features, low quality"
+STYLE = "Trending on artstation, digital art scene, matte style, diversity, uplifting, detailed, high quality, high resolution, professional"
+# STYLE = "Trending on artstation, anime style, detailed, digital art, studio ghibli"
+NEGATIVE = "NSFW, text, writing, watermark, signature, nudity, nude, canvas painting, pencil, photo, furniture, frame, border, harmful bias, depressing, ugly, whitewashed, sexualized, negative stereotype, poorly rendered face, poorly drawn face, poor facial details, poorly drawn hand, poorly rendered hands, poorly rendered eyes, low resolution, bad crop, bad composition, deformed body parts, blurry image, disfigured, unnatural, visual artifacts, bad anatomy, deformed facial features, low quality, amateur"
 
 
-def mux_lyrics_emotions(lyrics, emotions):
+def mux_lyrics_emotions(lyrics, emotions, length):
     i = 0
     j = 0
     t = 0
@@ -55,17 +56,33 @@ def mux_lyrics_emotions(lyrics, emotions):
             i += 1
         if t >= emotion_end:
             j += 1
+    mux_length = round(length * FR)
+    if mux_length > t:
+        mux.append((t, mux_length, None, None))
     return mux
 
 
-def build_prompts(mux, default="Abstract art of music"):
+# def build_prompts(mux, default="Abstract art of music"):
+#     prompts = []
+#     for start, end, lyric, emotion in mux:
+#         if lyric is None:
+#             lyric = default
+#         if emotion is None:
+#             emotion = "default"
+#         prompts.append(f"{round(start * FR)}: {STYLE}. {lyric} {EMOTIONS[emotion]}")
+#     prompts = "\n".join(prompts)
+#     return prompts
+
+
+def build_prompts(proto_prompts):
     prompts = []
-    for start, end, lyric, emotion in mux:
-        if lyric is None:
-            lyric = default
-        if emotion is None:
-            emotion = "default"
-        prompts.append(f"{round(start * FR)}: {STYLE}. {lyric} {EMOTIONS[emotion]}")
+    for start, end, line in proto_prompts:
+        # if lyric is None:
+        #     lyric = default
+        # if emotion is None:
+        #     emotion = "default"
+        prompts.append(f"{round(start * FR)}: {STYLE}. {line}")
+        # prompts.append(f"{round(start * FR)}: {STYLE}. {lyric} {EMOTIONS[emotion]}")
     prompts = "\n".join(prompts)
     return prompts
 
@@ -79,7 +96,8 @@ def get_pipe():
     return pipe
 
 
-def create_video(lyrics, emotions, title, seed=42):
+# def create_video(lyrics, emotions, title, length, seed=42):
+def create_video(proto_prompts, seed=42):
     # # Convert lyrics to prompts from llm.py?
     # lyrics_to_prompts(lyrics)
     # print("Generating video...")
@@ -91,9 +109,9 @@ def create_video(lyrics, emotions, title, seed=42):
 
     # lyrics: list of (start, end, lyric) pairs
     # emotions = mer.extract_emotions("audio.mp3") # list of (start, end, emotion) pairs
-    mux = mux_lyrics_emotions(lyrics, emotions)
-    print(mux)
-    prompts = build_prompts(mux, default=title)
+    # mux = mux_lyrics_emotions(lyrics, emotions, length)
+    # print(mux)
+    prompts = build_prompts(proto_prompts)
     print(prompts)
     # pipe = load_pipeline("stabilityai/stable-diffusion-2-1-base", "StableDiffusionPipeline", False, None)[0]
     pipe = get_pipe()
@@ -123,7 +141,7 @@ def create_video(lyrics, emotions, title, seed=42):
     #         seed = np.random.randint(np.iinfo(np.int32).max)
     #         run(pipe=pipe, text_prompt_inputs=text_prompt_input, negative_prompt_inputs=negative_prompt, fps=10, audio_input="temp.mp3", seed=seed, model_name="stable-diffusion-2-1-base")
     #     elif start > t:
-    #         if do_transition: # TODO mehul
+    #         if do_transition:
     #             dur = start - t
     #             t = start
     #             old_line = lyrics[i-1][2]
