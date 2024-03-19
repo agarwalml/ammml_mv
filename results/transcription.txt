@@ -1,0 +1,52 @@
+Clip length: 201.576
+Detecting language using up to the first 30 seconds. Use `--language` to specify the language
+Detected language: English
+[00:00.000 --> 00:11.260]  We were good, we were cold
+[00:11.260 --> 00:15.220]  Kind of dream that can't be sold
+[00:15.220 --> 00:19.000]  We were right till we weren't
+[00:19.740 --> 00:23.380]  Built a home and watched it burn
+[00:23.380 --> 00:26.480]  I didn't wanna leave you
+[00:26.480 --> 00:28.300]  I didn't wanna lie
+[00:28.300 --> 00:32.620]  Started to cry but then remembered I
+[00:32.620 --> 00:36.080]  I can buy myself flowers
+[00:36.080 --> 00:40.100]  Write my name in the sand
+[00:40.100 --> 00:44.720]  Talk to myself for hours
+[00:44.720 --> 00:47.620]  Say things you don't understand
+[00:47.620 --> 00:51.840]  I can take myself dancing
+[00:51.840 --> 00:56.440]  And I can hold my own hand
+[00:56.440 --> 00:58.240]  Yeah, I can love me
+[00:58.240 --> 00:58.280]  Yeah, I can love me
+[00:58.280 --> 00:58.300]  Yeah, I can love me
+[00:58.300 --> 01:01.780]  Better than you can
+[01:01.780 --> 01:03.000]  Can't love me better
+[01:03.000 --> 01:05.500]  I can love me better, baby
+[01:05.500 --> 01:07.080]  Can't love me better
+[01:07.080 --> 01:08.940]  I can love me better, baby
+[01:08.940 --> 01:12.460]  Paint my nails cherry red
+[01:12.460 --> 01:16.300]  Match the roses that you left
+[01:16.300 --> 01:20.080]  No remorse, no regret
+[01:20.080 --> 01:24.480]  I forget every word you said
+[01:24.480 --> 01:27.620]  Ooh, I didn't wanna leave you, babe
+[01:27.620 --> 01:28.280]  I didn't wanna leave you, babe
+[01:28.280 --> 01:29.280]  I didn't wanna fight
+[01:29.280 --> 01:33.760]  Started to cry but then remembered I
+[01:33.760 --> 01:37.600]  I can buy myself flowers
+[01:37.600 --> 01:41.600]  Write my name in the sand
+[01:41.600 --> 01:45.280]  Talk to myself for hours
+[01:45.280 --> 01:48.780]  Say things you don't understand
+[01:48.780 --> 01:52.860]  I can take myself dancing
+[01:52.860 --> 01:57.460]  I can hold my own hand
+[01:57.460 --> 01:58.260]  Yeah, I can hold my own hand
+[01:58.260 --> 02:10.300]  Oh, I can hold my own hand
+[02:10.300 --> 02:16.340]  Do you still remember me?
+[02:16.340 --> 02:17.140]  I beautiful as I am
+[02:17.140 --> 02:18.740]  Yes, I can do it
+[02:18.740 --> 02:21.540]  Nine months away
+[02:21.540 --> 02:23.360]  You better let me go
+[02:23.360 --> 02:24.640]  hero at the end
+[02:24.640 --> 02:26.120]  Feel me stronger
+[02:26.120 --> 02:27.260]  Show me more sense
+[02:27.260 --> 02:41.500]  I can buy myself flowers, write my name in the sand, talk to myself for hours, say things you don't understand.
+[02:41.500 --> 02:59.720]  I can take myself dancing, I can hold my man, I can love me better than, I can love me better than you can.
+[02:59.720 --> 03:03.400]  I can love me better, I can love me better, baby.
+[03:11.500 --> 03:13.840]  I can love me better, ah.
