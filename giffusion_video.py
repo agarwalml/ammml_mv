@@ -115,7 +115,7 @@ def create_video(proto_prompts, seed=42):
     print(prompts)
     # pipe = load_pipeline("stabilityai/stable-diffusion-2-1-base", "StableDiffusionPipeline", False, None)[0]
     pipe = get_pipe()
-    run(pipe=pipe, text_prompt_inputs=prompts, negative_prompt_inputs=NEGATIVE, fps=FR, audio_input="audio.mp3", seed=seed, model_name="stable-diffusion-2-1-base")
+    run(pipe=pipe, text_prompt_inputs=prompts, negative_prompt_inputs=NEGATIVE, fps=FR, audio_input="/home/ec2-user/main/ammml_mv/results/audio.mp3", seed=seed, model_name="stable-diffusion-2-1-base")
 
 
     # for i, (start, end, line) in enumerate(lyrics):
